@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>sonos-chrome</title>
+
+    <link rel="stylesheet" href="styles/fonts.scss">
+    <link rel="stylesheet" href="bower_components/semantic-ui/dist/semantic.css">
+    
+  </head>
+  <body ng-app="sochrome" ng-csp>
+    <sonos-list></sonos-list>
+    <!-- build:js scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/lodash/lodash.js"></script>
+    <script src="bower_components/ng-lodash/build/ng-lodash.min.js"></script>
+    <script src="bower_components/sprintf/dist/sprintf.min.js"></script>
+    <script src="bower_components/sprintf/dist/angular-sprintf.min.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:js scripts/index.js -->
+    <script src="scripts/app.js"></script>
+    <script src="scripts/directives/sonos.js"></script>
+    <script src="scripts/directives/sonos-list.js"></script>
+    <script src="scripts/services/discovery.js"></script>
+    <script src="scripts/services/message-service.js"></script>
+    <script src="scripts/services/network-service.js"></script>
+    <script src="scripts/services/sonos.js"></script>
+    <script src="scripts/services/sonos-manager.js"></script>
+    <script src="scripts/services/sprintf.js"></script>
+    <!-- endbuild -->
+  </body>
+</html>

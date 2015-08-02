@@ -1,0 +1,12 @@
+<div class="ui grid">
+  <div
+    ng-repeat="group in groups"
+    class="four wide column">
+    <div
+      ng-repeat="member in group.members"
+      ng-if="!member.isBridge">
+    <sonos data="member">
+    </sonos>
+    </div>
+  </div>
+</div>
