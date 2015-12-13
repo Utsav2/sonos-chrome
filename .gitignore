@@ -3,5 +3,5 @@ temp
 .tmp
 dist
 .sass-cache
-./bower_components
+bower_components
 package/
