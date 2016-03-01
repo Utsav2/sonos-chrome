@@ -8,7 +8,7 @@ angular.module('sochrome')
     link: function($scope) {
       SonosManager.getZoneGroupsPromise()
         .then(function(groups) {
-          $scope.groups = groups;
+	  $scope.groups = groups;
         });
     }
   };

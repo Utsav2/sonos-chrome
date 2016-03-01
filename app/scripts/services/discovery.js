@@ -1,10 +1,12 @@
 'use strict';
 
 angular.module('sochrome')
-.service('DiscoveryService', ['lodash', 'MessageService', 'NetworkService', 'Sonos', function(_, MessageService, NetworkService, Sonos) {
+.service('DiscoveryService', ['lodash', 'MessageService', 'NetworkService', 'Sonos', '$timeout', function(_, MessageService, NetworkService, Sonos, $timeout) {
 
   var NUMBER_OF_REQUESTS = 5;
   var STOP_SEARCHING = false;
+  var searchTimeout;
+
   var searchString = 'M-SEARCH * HTTP/1.1\r\n' +
     'ST: ssdp:all\r\n' +
     'MAN: \"ssdp:discover\"\r\n' +
@@ -24,6 +26,7 @@ angular.module('sochrome')
       getTopology(request, info);
       STOP_SEARCHING = true;
     }
+    clearTimeout(searchTimeout);
   };
 
   var udpSocketInterface = chrome.sockets.udp;
@@ -36,8 +39,7 @@ angular.module('sochrome')
 
   var parseZoneGroupMember = function(member) {
     var name = member.attributes.getNamedItem('ZoneName').nodeValue;
-    var isBridge = member.attributes.getNamedItem('IsZoneBridge');
-    isBridge  = isBridge ? true : false;
+    var isBridge = member.attributes.getNamedItem('IsZoneBridge') ? true : false;
     var fullAddress = member.attributes.Location.nodeValue;
     var ipAddress = fullAddress.substring(fullAddress.indexOf(':') + 3, fullAddress.lastIndexOf(':'));
     return new Sonos(name, ipAddress, isBridge);
@@ -85,6 +87,10 @@ angular.module('sochrome')
 
         var buffer = MessageService.stringToArrayBuffer(searchString);
         var searchTimes = NUMBER_OF_REQUESTS;
+
+	searchTimeout = $timeout(function() {
+	  // TODO
+	}, 10 * 1000);
 
         /*jshint loopfunc: true */
         while (searchTimes--) {
