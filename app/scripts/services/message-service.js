@@ -30,6 +30,8 @@ function($cacheFactory, $http, MESSAGE_SERVICE_CACHE_ID, $q, sprintf) {
   var serviceTypes = {
     'Play': avTransportServiceType,
     'Pause': avTransportServiceType,
+    'Previous': avTransportServiceType,
+    'Next': avTransportServiceType,
     'GetZoneGroupState': zoneGroupTopologyServiceType
   };
 
@@ -39,6 +41,8 @@ function($cacheFactory, $http, MESSAGE_SERVICE_CACHE_ID, $q, sprintf) {
   var controlUrls = {
     'Play':  avTransportControlUrl,
     'Pause': avTransportControlUrl ,
+    'Previous': avTransportControlUrl,
+    'Next': avTransportControlUrl,
     'GetZoneGroupState': zoneGroupTopologyControlUrl
   };
 
@@ -80,6 +84,9 @@ function($cacheFactory, $http, MESSAGE_SERVICE_CACHE_ID, $q, sprintf) {
   var buildCommand = function(action, args) {
     args = wrapArguments(args);
     var serviceType = getServiceType(action);
+    if (!serviceType) {
+      throw 'Invalid serviceType!' + action
+    }
     var bodyVariables = {
       args: args,
       action: action,
@@ -111,6 +118,9 @@ function($cacheFactory, $http, MESSAGE_SERVICE_CACHE_ID, $q, sprintf) {
   this.sendCommand = function(sonos, action, args) {
     var message = buildCommand(action, args);
     var controlUrl = getControlUrl(action);
+    if (!controlUrl) {
+      throw 'Invalid control urls for action: ' + action
+    }
     var url = sprintf('http://%s:%d%s', sonos.ipAddress, 1400, controlUrl);
     var request = {
       method: 'POST',

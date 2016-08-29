@@ -15,7 +15,9 @@ angular.module('sochrome')
 
   var params = {
     'Play': playPauseParams,
-    'Pause': playPauseParams
+    'Pause': playPauseParams,
+    'Previous': playPauseParams,
+    'Next': playPauseParams,
   };
 
   var sendCommand = function(sonos, name) {
@@ -28,6 +30,14 @@ angular.module('sochrome')
 
   this.pause = function(sonos) {
     return sendCommand(sonos, 'Pause');
+  };
+
+  this.next = function(sonos) {
+    return sendCommand(sonos, 'Next');
+  };
+
+  this.previous = function(sonos) {
+    return sendCommand(sonos, 'Previous');
   };
 
   //http://stackoverflow.com/a/7918944/3399432

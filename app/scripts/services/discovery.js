@@ -39,7 +39,7 @@ angular.module('sochrome')
 
   var parseZoneGroupMember = function(member) {
     var name = member.attributes.getNamedItem('ZoneName').nodeValue;
-    var isBridge = member.attributes.getNamedItem('IsZoneBridge') ? true : false;
+    var isBridge = !!member.attributes.getNamedItem('IsZoneBridge');
     var fullAddress = member.attributes.Location.nodeValue;
     var ipAddress = fullAddress.substring(fullAddress.indexOf(':') + 3, fullAddress.lastIndexOf(':'));
     return new Sonos(name, ipAddress, isBridge);
