@@ -9,22 +9,33 @@ angular.module('sochrome')
     },
     templateUrl: 'views/directives/sonos.html',
     link: function($scope) {
+
+      var sonos = $scope.data;
+
+      function resetInfo() {
+        NetworkService.getCurrentTrackInfo(sonos).then(function(info) {
+          $scope.currentTrackInfo = info;
+        });
+      }
+
+      resetInfo();
+
       $scope.play = function() {
-        var sonos = $scope.data;
-        NetworkService.play(sonos);
+        NetworkService.play(sonos).then(resetInfo);
       };
+
       $scope.pause = function() {
-        var sonos = $scope.data;
-        NetworkService.pause(sonos);
+        NetworkService.pause(sonos).then(resetInfo);
       };
+
       $scope.next = function() {
-        var sonos = $scope.data;
-        NetworkService.next(sonos);
+        NetworkService.next(sonos).then(resetInfo);
       };
+
       $scope.previous = function() {
-        var sonos = $scope.data;
-        NetworkService.previous(sonos);
+        NetworkService.previous(sonos).then(resetInfo);
       };
+
     }
   };
 }]);

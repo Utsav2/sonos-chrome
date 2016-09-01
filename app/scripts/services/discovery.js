@@ -1,12 +1,10 @@
 'use strict';
 
 angular.module('sochrome')
-.service('DiscoveryService', ['lodash', 'MessageService', 'NetworkService', 'Sonos', '$timeout', function(_, MessageService, NetworkService, Sonos, $timeout) {
+.service('DiscoveryService', ['$q', 'lodash', 'MessageService', 'NetworkService', 'Sonos', function($q, _, MessageService, NetworkService, Sonos) {
 
   var NUMBER_OF_REQUESTS = 5;
   var STOP_SEARCHING = false;
-  var searchTimeout;
-
   var searchString = 'M-SEARCH * HTTP/1.1\r\n' +
     'ST: ssdp:all\r\n' +
     'MAN: \"ssdp:discover\"\r\n' +
@@ -26,7 +24,6 @@ angular.module('sochrome')
       getTopology(request, info);
       STOP_SEARCHING = true;
     }
-    clearTimeout(searchTimeout);
   };
 
   var udpSocketInterface = chrome.sockets.udp;
@@ -41,7 +38,8 @@ angular.module('sochrome')
     var name = member.attributes.getNamedItem('ZoneName').nodeValue;
     var isBridge = !!member.attributes.getNamedItem('IsZoneBridge');
     var fullAddress = member.attributes.Location.nodeValue;
-    var ipAddress = fullAddress.substring(fullAddress.indexOf(':') + 3, fullAddress.lastIndexOf(':'));
+    var ipAddress = fullAddress.substring(fullAddress.indexOf(':') + 3,
+        fullAddress.lastIndexOf(':'));
     return new Sonos(name, ipAddress, isBridge);
   };
 
@@ -53,7 +51,8 @@ angular.module('sochrome')
       _.each(zoneGroup.childNodes, function(member) {
         members.push(parseZoneGroupMember(member));
       });
-      zoneGroups.push(new ZoneGroup(zoneGroup.attributes[0].nodeValue, zoneGroup.attributes[1].nodeValue, members));
+      zoneGroups.push(new ZoneGroup(zoneGroup.attributes[0].nodeValue,
+            zoneGroup.attributes[1].nodeValue, members));
     });
     request.resolve(zoneGroups);
   };
@@ -66,13 +65,14 @@ angular.module('sochrome')
       });
   };
 
-  this.discover = function(request) {
+  this.discover = function() {
+
+    var request = $q.defer();
 
     STOP_SEARCHING = false;
 
     udpSocketInterface.create({}, function(createInfo) {
       var socketId = createInfo.socketId;
-      MessageService.registerSocketId(socketId);
 
       udpSocketInterface.bind(socketId, '0.0.0.0', 0, function(response) {
         if (response !== 0) {
@@ -88,21 +88,19 @@ angular.module('sochrome')
         var buffer = MessageService.stringToArrayBuffer(searchString);
         var searchTimes = NUMBER_OF_REQUESTS;
 
-	searchTimeout = $timeout(function() {
-	  // TODO
-	}, 10 * 1000);
+        var loggingCallback = function(sendInfo) {
+          if (sendInfo.resultCode < 0) {
+            console.error(sendInfo);
+          }
+        };
 
-        /*jshint loopfunc: true */
         while (searchTimes--) {
-
-          udpSocketInterface.send(socketId, buffer, host, port, function(sendInfo) {
-
-            if (sendInfo.resultCode < 0) {
-              console.error('There was an error in sending the data');
-            }
-          });
+          udpSocketInterface.send(socketId, buffer, host, port, loggingCallback);
         }
       });
     });
+
+    return request.promise;
   };
+
 }]);

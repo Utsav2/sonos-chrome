@@ -6,9 +6,9 @@ angular.module('sochrome')
     restrict: 'E',
     templateUrl: 'views/directives/sonos-list.html',
     link: function($scope) {
-      SonosManager.getZoneGroupsPromise()
+      SonosManager.getZoneGroups()
         .then(function(groups) {
-	  $scope.groups = groups;
+          $scope.groups = groups;
         });
     }
   };

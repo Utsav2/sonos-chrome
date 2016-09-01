@@ -1,17 +1,31 @@
 <div class="ui card">
   <div class="content">
-  {{ data.name }}
+    {{ data.name }}
+    <p>
+    <p>
+    <div>
+    {{ currentTrackInfo.title }}
+    <p>
+    {{ currentTrackInfo.artist }}
+    <p>
+    {{ currentTrackInfo.album }}
+    <p>
+    </div>
   </div>
   <a ng-click="play()">
+    <i class="play icon"></i>
     Play
   </a>
   <a ng-click="pause()">
+    <i class="pause icon"></i>
     Pause
   </a>
   <a ng-click="previous()">
+    <i class="fast backward icon"></i>
     Previous
   </a>
   <a ng-click="next()">
+    <i class="fast forward icon"></i>
     Next
   </a>
 </div>

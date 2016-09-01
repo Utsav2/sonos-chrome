@@ -4,6 +4,7 @@ angular.module('sochrome')
 .service('MessageService', ['$cacheFactory', '$http', 'MESSAGE_SERVICE_CACHE_ID', '$q', 'sprintf',
 
 function($cacheFactory, $http, MESSAGE_SERVICE_CACHE_ID, $q, sprintf) {
+
   this.stringToArrayBuffer = function(str) {
     var buffer = new ArrayBuffer(str.length);
     var view = new DataView(buffer);
@@ -32,6 +33,7 @@ function($cacheFactory, $http, MESSAGE_SERVICE_CACHE_ID, $q, sprintf) {
     'Pause': avTransportServiceType,
     'Previous': avTransportServiceType,
     'Next': avTransportServiceType,
+    'GetPositionInfo': avTransportServiceType,
     'GetZoneGroupState': zoneGroupTopologyServiceType
   };
 
@@ -43,6 +45,7 @@ function($cacheFactory, $http, MESSAGE_SERVICE_CACHE_ID, $q, sprintf) {
     'Pause': avTransportControlUrl ,
     'Previous': avTransportControlUrl,
     'Next': avTransportControlUrl,
+    'GetPositionInfo': avTransportControlUrl,
     'GetZoneGroupState': zoneGroupTopologyControlUrl
   };
 
@@ -85,7 +88,7 @@ function($cacheFactory, $http, MESSAGE_SERVICE_CACHE_ID, $q, sprintf) {
     args = wrapArguments(args);
     var serviceType = getServiceType(action);
     if (!serviceType) {
-      throw 'Invalid serviceType!' + action
+      throw 'Invalid serviceType!' + action;
     }
     var bodyVariables = {
       args: args,
@@ -97,18 +100,13 @@ function($cacheFactory, $http, MESSAGE_SERVICE_CACHE_ID, $q, sprintf) {
     var messageBody = sprintf(soapBodyTemplate, bodyVariables);
     var actionBody = sprintf(soapActionTemplate, bodyVariables);
 
-    var headers = {'Content-Type': 'text/xml; charset="utf-8"', SOAPACTION: actionBody, Accept: 'text/xml'};
+    var headers = {'Content-Type': 'text/xml; charset="utf-8"',
+      SOAPACTION: actionBody, Accept: 'text/xml'};
 
     return {
       headers: headers,
       body: messageBody
     };
-  };
-
-  var socketId;
-
-  this.registerSocketId = function(id) {
-    socketId = id;
   };
 
   var getControlUrl = function(action) {
@@ -119,7 +117,7 @@ function($cacheFactory, $http, MESSAGE_SERVICE_CACHE_ID, $q, sprintf) {
     var message = buildCommand(action, args);
     var controlUrl = getControlUrl(action);
     if (!controlUrl) {
-      throw 'Invalid control urls for action: ' + action
+      throw 'Invalid control url for action: ' + action;
     }
     var url = sprintf('http://%s:%d%s', sonos.ipAddress, 1400, controlUrl);
     var request = {

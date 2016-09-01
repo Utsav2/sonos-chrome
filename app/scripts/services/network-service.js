@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('sochrome')
-.service('NetworkService', ['MessageService', '$q', function(MessageService, $q) {
+.service('NetworkService', ['MessageService','TrackParser','XmlUtil', '$q', function(MessageService, TrackParser, XmlUtil, $q) {
   var playPauseParams = [
     {
       name: 'InstanceID',
@@ -13,11 +13,24 @@ angular.module('sochrome')
     }
   ];
 
+  var getTrackInfoParams = [
+    {
+      name: 'InstanceID',
+      value: 0
+    },
+    {
+      name: 'Channel',
+      value: 'Master'
+    }
+  ];
+
+
   var params = {
     'Play': playPauseParams,
     'Pause': playPauseParams,
     'Previous': playPauseParams,
     'Next': playPauseParams,
+    'GetPositionInfo': getTrackInfoParams,
   };
 
   var sendCommand = function(sonos, name) {
@@ -40,22 +53,22 @@ angular.module('sochrome')
     return sendCommand(sonos, 'Previous');
   };
 
-  //http://stackoverflow.com/a/7918944/3399432
-  var escapeXML = function(string) {
-    return string.replace(/&apos;/g, '\'')
-      .replace(/&quot;/g, '"')
-      .replace(/&gt;/g, '>')
-      .replace(/&lt;/g, '<')
-      .replace(/&amp;/g, '&');
+  this.getCurrentTrackInfo = function(sonos) {
+    var deferred = $q.defer();
+    sendCommand(sonos, 'GetPositionInfo').then(function(info) {
+      deferred.resolve(TrackParser.parse(info));
+    }).catch(function(err) {
+      deferred.reject(err);
+    });
+    return deferred.promise;
   };
+
 
   this.getZoneGroupState = function(sonos) {
     var topologyParsed = $q.defer();
     var topologyResponse = sendCommand(sonos, 'GetZoneGroupState');
     topologyResponse.then(function(data) {
-      var parser = new DOMParser();
-      var parsed = parser.parseFromString(escapeXML(data), 'text/xml');
-      topologyParsed.resolve(parsed);
+      topologyParsed.resolve(XmlUtil.parse(data));
     });
     return topologyParsed.promise;
   };
